@@ -1,7 +1,7 @@
-using Notch.App.Interop;
-using static Notch.App.Interop.NativeMethods;
+using Aisa.App.Interop;
+using static Aisa.App.Interop.NativeMethods;
 
-namespace Notch.App.Platform;
+namespace Aisa.App.Platform;
 
 /// <summary>
 /// Owns the window's click-through state. The UI thread publishes the island rect (already inflated by

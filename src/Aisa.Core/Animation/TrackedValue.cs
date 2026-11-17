@@ -1,6 +1,4 @@
-using System.Windows.Media;
-
-namespace Notch.App.Animation;
+namespace Aisa.Core.Animation;
 
 /// <summary>CSS-style cubic-bezier easing. Shrink uses (0.45, 0, 0.2, 1): firm, no overshoot.</summary>
 public readonly record struct CubicBezier(double X1, double Y1, double X2, double Y2)
@@ -119,35 +117,3 @@ public sealed class TrackedValue(double initial)
     }
 }
 
-/// <summary>
-/// Single vsync-locked frame driver (CompositionTarget.Rendering). Unsubscribes itself when the tick
-/// reports nothing is moving, so an idle island costs ~0% CPU.
-/// </summary>
-public sealed class FrameLoop(Func<double, bool> tick)
-{
-    private const double MaxDelta = 0.05;
-    private TimeSpan? _last;
-    private bool _running;
-
-    public void Wake()
-    {
-        if (_running) return;
-        _running = true;
-        _last = null;
-        CompositionTarget.Rendering += OnRendering;
-    }
-
-    private void OnRendering(object? sender, EventArgs e)
-    {
-        var now = ((RenderingEventArgs)e).RenderingTime;
-        if (_last == now) return; // Rendering can fire more than once per frame
-        double dt = _last is { } last ? Math.Min((now - last).TotalSeconds, MaxDelta) : 1.0 / 60;
-        _last = now;
-
-        if (!tick(dt))
-        {
-            CompositionTarget.Rendering -= OnRendering;
-            _running = false;
-        }
-    }
-}

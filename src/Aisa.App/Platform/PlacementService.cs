@@ -1,6 +1,6 @@
-using static Notch.App.Interop.NativeMethods;
+using static Aisa.App.Interop.NativeMethods;
 
-namespace Notch.App.Platform;
+namespace Aisa.App.Platform;
 
 public enum NotchAnchor { Left, Center, Right }
 

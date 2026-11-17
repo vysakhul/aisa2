@@ -1,7 +1,7 @@
 using System.Windows.Threading;
-using static Notch.App.Interop.NativeMethods;
+using static Aisa.App.Interop.NativeMethods;
 
-namespace Notch.App.Platform;
+namespace Aisa.App.Platform;
 
 /// <summary>
 /// Background global-cursor poller (Spec 1.4 / 4.1): 16 ms near, 50 ms far, parked at 250 ms while folded.
@@ -32,7 +32,7 @@ internal sealed class GlobalCursorMonitor : IDisposable
     {
         _hitTest = hitTest;
         _dispatcher = dispatcher;
-        _thread = new Thread(Run) { IsBackground = true, Name = "Notch cursor monitor", Priority = ThreadPriority.AboveNormal };
+        _thread = new Thread(Run) { IsBackground = true, Name = "Aisa cursor monitor", Priority = ThreadPriority.AboveNormal };
     }
 
     /// <summary>While folded the poll parks at 250 ms and only checks for a wake on the notch.</summary>
