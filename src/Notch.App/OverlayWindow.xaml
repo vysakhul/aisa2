@@ -1,0 +1,44 @@
+<Window x:Class="Notch.App.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Notch"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        Topmost="True"
+        SizeToContent="Manual"
+        Width="720" Height="360"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+
+    <Grid x:Name="Root">
+        <!-- Hit margin: the layered window lets alpha-0 pixels fall through even when input is enabled,
+             so the 14 px margin is painted at alpha 1/255 to keep a grazing cursor "on" the island. -->
+        <Border x:Name="IslandHost"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Center"
+                Padding="14,0,14,14"
+                Background="#01000000"
+                MouseLeftButtonDown="OnIslandMouseDown">
+            <Border x:Name="Island"
+                    Background="Black"
+                    CornerRadius="0,0,10,10"
+                    Width="120" Height="24"
+                    ClipToBounds="True">
+                <Grid x:Name="ContentLayer" Opacity="0" Margin="20,10,20,14" IsHitTestVisible="False">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Notch starter" Foreground="#CCFFFFFF" FontSize="13" FontWeight="SemiBold" />
+                    <TextBox x:Name="InputBox" Grid.Row="1" VerticalAlignment="Bottom" Height="30"
+                             Background="#141518" Foreground="White" BorderBrush="#33FFFFFF"
+                             CaretBrush="White" Padding="8,5" FontSize="13" />
+                </Grid>
+            </Border>
+        </Border>
+    </Grid>
+</Window>
