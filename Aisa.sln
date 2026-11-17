@@ -35,6 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{07C2787E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aisa.CharacterPreview", "tools\Aisa.CharacterPreview\Aisa.CharacterPreview.csproj", "{E04D5BF8-8467-4E5D-8880-6F5392534A5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aisa.CharacterVariants", "tools\Aisa.CharacterVariants\Aisa.CharacterVariants.csproj", "{5970A14C-8809-45EC-8820-F5868FFAB6F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -201,6 +203,18 @@ Global
 		{E04D5BF8-8467-4E5D-8880-6F5392534A5B}.Release|x64.Build.0 = Release|Any CPU
 		{E04D5BF8-8467-4E5D-8880-6F5392534A5B}.Release|x86.ActiveCfg = Release|Any CPU
 		{E04D5BF8-8467-4E5D-8880-6F5392534A5B}.Release|x86.Build.0 = Release|Any CPU
+		{5970A14C-8809-45EC-8820-F5868FFAB6F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5970A14C-8809-45EC-8820-F5868FFAB6F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5970A14C-8809-45EC-8820-F5868FFAB6F8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5970A14C-8809-45EC-8820-F5868FFAB6F8}.Debug|x64.Build.0 = Debug|Any CPU
+		{5970A14C-8809-45EC-8820-F5868FFAB6F8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5970A14C-8809-45EC-8820-F5868FFAB6F8}.Debug|x86.Build.0 = Debug|Any CPU
+		{5970A14C-8809-45EC-8820-F5868FFAB6F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5970A14C-8809-45EC-8820-F5868FFAB6F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5970A14C-8809-45EC-8820-F5868FFAB6F8}.Release|x64.ActiveCfg = Release|Any CPU
+		{5970A14C-8809-45EC-8820-F5868FFAB6F8}.Release|x64.Build.0 = Release|Any CPU
+		{5970A14C-8809-45EC-8820-F5868FFAB6F8}.Release|x86.ActiveCfg = Release|Any CPU
+		{5970A14C-8809-45EC-8820-F5868FFAB6F8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -219,5 +233,6 @@ Global
 		{4FD9584D-4102-40F7-A0BB-E79FFF373D5B} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{9C5F7B2A-1CAA-4E05-8B77-0E6215C561D1} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{E04D5BF8-8467-4E5D-8880-6F5392534A5B} = {07C2787E-EAC7-C090-1BA3-A61EC2A24D84}
+		{5970A14C-8809-45EC-8820-F5868FFAB6F8} = {07C2787E-EAC7-C090-1BA3-A61EC2A24D84}
 	EndGlobalSection
 EndGlobal
