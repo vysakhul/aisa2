@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace Notch.App;
+namespace Aisa.App;
 
 public partial class App : Application
 {

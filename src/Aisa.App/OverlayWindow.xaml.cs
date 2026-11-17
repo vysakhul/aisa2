@@ -5,12 +5,12 @@ using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Microsoft.Win32;
-using Notch.App.Animation;
-using Notch.App.Interop;
-using Notch.App.Platform;
-using static Notch.App.Interop.NativeMethods;
+using Aisa.App.Animation;
+using Aisa.App.Interop;
+using Aisa.App.Platform;
+using static Aisa.App.Interop.NativeMethods;
 
-namespace Notch.App;
+namespace Aisa.App;
 
 /// <summary>
 /// Spec 4.1 top-level overlay: borderless, per-pixel transparent, topmost tool window that never

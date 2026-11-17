@@ -1,6 +1,6 @@
-using static Notch.App.Interop.NativeMethods;
+using static Aisa.App.Interop.NativeMethods;
 
-namespace Notch.App.Interop;
+namespace Aisa.App.Interop;
 
 /// <summary>
 /// Serialises read-modify-write of WS_EX_* bits. The cursor thread flips WS_EX_TRANSPARENT while the

@@ -1,10 +1,10 @@
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Notch.App.Interop;
-using static Notch.App.Interop.NativeMethods;
+using Aisa.App.Interop;
+using static Aisa.App.Interop.NativeMethods;
 
-namespace Notch.App.Platform;
+namespace Aisa.App.Platform;
 
 /// <summary>
 /// The window is non-activating by default. When a text-entry view appears it becomes focusable, takes

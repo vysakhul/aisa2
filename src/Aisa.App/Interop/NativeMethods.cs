@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Notch.App.Interop;
+namespace Aisa.App.Interop;
 
 internal static class NativeMethods
 {
