@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <!-- Only for the tray NotifyIcon. -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RootNamespace>Aisa.App</RootNamespace>
+    <AssemblyName>Aisa</AssemblyName>
+    <!-- Lets the project compile on non-Windows CI; it still only runs on Windows. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <!-- WFO0003 targets WinForms apps; WPF needs per-monitor v2 in the manifest, WinForms only hosts the tray icon. -->
+    <NoWarn>$(NoWarn);WFO0003</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WinForms implicit usings clash with WPF types (Application, Point, Brush...). -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp.Views.WPF" Version="3.119.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Aisa.Core\Aisa.Core.csproj" />
+    <ProjectReference Include="..\Aisa.Scheduling\Aisa.Scheduling.csproj" />
+    <ProjectReference Include="..\Aisa.Nlu\Aisa.Nlu.csproj" />
+    <ProjectReference Include="..\Aisa.Audio\Aisa.Audio.csproj" />
+    <ProjectReference Include="..\Aisa.Character\Aisa.Character.csproj" />
+    <ProjectReference Include="..\Aisa.Character.Rendering\Aisa.Character.Rendering.csproj" />
+  </ItemGroup>
+</Project>
