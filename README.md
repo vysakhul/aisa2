@@ -1,6 +1,6 @@
 # Aisa
 
-A Windows 11 notch assistant: a black island glued to the top of the screen with an animated character that sets alarms and reminders from chat. Unknown phrasing falls back to a local LLM through LM Studio.
+A Windows 11 notch assistant: a black island glued to the top of the screen with an animated character that sets alarms and reminders from chat. Unknown phrasing falls back to a local LLM through LM Studio..
 
 ## Run it (Windows 11)
 
