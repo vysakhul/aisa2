@@ -49,7 +49,7 @@ public partial class App : Application
         var settings = _settings.Load();
         var time = TimeProvider.System;
 
-        _sound = new SoundService(time, overrideFolder: Path.Combine(dataDir, "sounds"));
+        _sound = new SoundService(time, soundFolder: Path.Combine(dataDir, "sounds"));
         var character = new CharacterEngine();
         character.SoundRequested += cue => _sound.Play(Map(cue));
 

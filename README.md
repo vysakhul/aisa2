@@ -23,11 +23,11 @@ Start LM Studio's local server (Developer tab → Start Server, default `http://
 | `src/Aisa.Character.Rendering` | SkiaSharp renderer for the character |
 | `src/Aisa.Scheduling` | Alarm/reminder scheduler with JSON persistence |
 | `src/Aisa.Nlu` | Deterministic parser + LM Studio structured-output fallback |
-| `src/Aisa.Audio` | Procedurally synthesized sounds (NAudio), separate alert channel |
+| `src/Aisa.Audio` | WAV cue playback through NAudio, separate alert channel |
 | `tools/Aisa.CharacterPreview` | Renders every character state to PNG |
 
 The headless projects target plain `net10.0`, so `dotnet test` runs on any OS.
 
 ## Data
 
-Everything lives in `%AppData%\Aisa`: `settings.json`, `schedule.json`, and an optional `sounds\` folder where a `<Cue>.wav` (for example `Finish.wav` or `AlarmLoop.wav`) replaces that built-in sound.
+Everything lives in `%AppData%\Aisa`: `settings.json`, `schedule.json`, and `sounds\`. A cue plays only when its matching `<Cue>.wav` file is present there; missing or invalid files are silent. Run `assets\sounds\install.ps1` to install the bundled WAVs.

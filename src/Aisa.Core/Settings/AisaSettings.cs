@@ -14,7 +14,7 @@ public sealed record AisaSettings
     public int CompactHideSeconds { get; init; } = 10;
     public bool OpenOnFaceHover { get; init; } = true;
     public bool SoundEnabled { get; init; } = true;
-    public double UiVolume { get; init; } = 0.12;
+    public double UiVolume { get; init; } = 0.35;
     public double AlarmVolume { get; init; } = 0.8;
     public int SnoozeMinutes { get; init; } = 10;
     public bool LmStudioEnabled { get; init; } = true;

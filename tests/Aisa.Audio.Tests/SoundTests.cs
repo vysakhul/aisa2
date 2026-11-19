@@ -109,8 +109,10 @@ public class ServiceTests : IDisposable
     [Fact]
     public void MuteSilencesUiButNotAlerts()
     {
+        WriteWav("Finish", 0.5f);
+        WriteWav("ReminderChime", 0.5f);
         var f = new FakeFactory();
-        var svc = Make(new FakeTimeProvider(), f);
+        var svc = Make(new FakeTimeProvider(), f, _dir);
         svc.UiVolume = 0.5f;
         svc.Play(SoundCue.Finish);
         WaitFor(() => f.Count == 1);
@@ -129,8 +131,9 @@ public class ServiceTests : IDisposable
     [Fact]
     public void UiVolumeScalesOutput()
     {
+        WriteWav("Finish", 0.5f);
         var f = new FakeFactory();
-        var svc = Make(new FakeTimeProvider(), f);
+        var svc = Make(new FakeTimeProvider(), f, _dir);
         svc.UiVolume = 0.12f;
         svc.Play(SoundCue.Finish);
         WaitFor(() => f.Count == 1);
@@ -141,9 +144,10 @@ public class ServiceTests : IDisposable
     [Fact]
     public void DeviceReleasedAfterSilenceAndRecreated()
     {
+        WriteWav("Blip", 0.5f);
         var t = new FakeTimeProvider();
         var f = new FakeFactory();
-        var svc = Make(t, f);
+        var svc = Make(t, f, _dir);
         svc.Play(SoundCue.Blip);
         WaitFor(() => f.Count == 1);
         f.Outputs[0].Pull(48000); // let the cue finish
@@ -163,9 +167,10 @@ public class ServiceTests : IDisposable
     [Fact]
     public void AlarmLoopsUntilStopped()
     {
+        WriteWav("AlarmLoop", 0.5f);
         var t = new FakeTimeProvider();
         var f = new FakeFactory();
-        var svc = Make(t, f);
+        var svc = Make(t, f, _dir);
         svc.StartAlert(AlertTone.AlarmLoop);
         WaitFor(() => f.Count == 1);
         for (var i = 0; i < 5; i++) Assert.True(f.Outputs[0].Pull(48000) > 0.05f); // 5 s > one period
@@ -183,8 +188,9 @@ public class ServiceTests : IDisposable
     [Fact]
     public void ReminderChimePlaysOnce()
     {
+        WriteWav("ReminderChime", 0.5f);
         var f = new FakeFactory();
-        var svc = Make(new FakeTimeProvider(), f);
+        var svc = Make(new FakeTimeProvider(), f, _dir);
         svc.StartAlert(AlertTone.ReminderChime);
         WaitFor(() => f.Count == 1);
         f.Outputs[0].Pull(72000);
@@ -200,7 +206,7 @@ public class ServiceTests : IDisposable
     }
 
     [Fact]
-    public void OverrideWavIsUsedAndResampled()
+    public void SoundFileIsLoadedAndResampled()
     {
         WriteWav("Blip", 0.5f, 22050, 2);
         var f = new FakeFactory();
@@ -213,13 +219,37 @@ public class ServiceTests : IDisposable
     }
 
     [Fact]
-    public void CorruptAlertOverrideFallsBackToSynth()
+    public void CorruptAlertFileIsSilent()
     {
         File.WriteAllBytes(Path.Combine(_dir, "AlarmLoop.wav"), [1, 2, 3, 4, 5]);
         var f = new FakeFactory();
         var svc = Make(new FakeTimeProvider(), f, _dir);
         svc.StartAlert(AlertTone.AlarmLoop);
+        Assert.False(svc.IsAlertPlaying);
+        Assert.Equal(0, f.Count);
+    }
+
+    [Fact]
+    public void ReusedWaveBufferSilencesAfterCueEnds()
+    {
+        WriteWav("Peek", 0.5f, rate: 48000, channels: 1);
+        var f = new FakeFactory();
+        var svc = Make(new FakeTimeProvider(), f, _dir);
+        svc.UiVolume = 1f;
+        svc.Play(SoundCue.Peek);
         WaitFor(() => f.Count == 1);
-        Assert.True(f.Outputs[0].Pull(24000) > 0.05f);
+
+        // Simulate NAudio's SampleToWaveProvider reusing a byte[] buffer across reads
+        // (60 ms initial fill followed by 10 ms period refills, as WasapiOut does).
+        var waveProvider = new NAudio.Wave.SampleProviders.SampleToWaveProvider(f.Outputs[0].Source!);
+        var readBuffer = new byte[2880 * 8];
+        waveProvider.Read(readBuffer, 0, readBuffer.Length);
+
+        var periodBytes = 480 * 8;
+        for (var i = 0; i < 40; i++)
+            waveProvider.Read(readBuffer, 0, periodBytes);
+
+        var tail = System.Runtime.InteropServices.MemoryMarshal.Cast<byte, float>(readBuffer.AsSpan(0, periodBytes));
+        Assert.Equal(0f, tail.ToArray().Max(Math.Abs));
     }
 }

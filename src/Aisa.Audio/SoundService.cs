@@ -11,11 +11,10 @@ public sealed class SoundService : IDisposable
 
     private readonly TimeProvider _time;
     private readonly IAudioOutputFactory _factory;
-    private readonly string? _overrideFolder;
+    private readonly string? _soundFolder;
     private readonly VoiceBank _ui = new();
     private readonly VoiceBank _alert = new();
-    private readonly Dictionary<string, float[]?> _overrides = new();
-    private readonly Dictionary<string, float[]> _synthCache = new();
+    private readonly Dictionary<string, float[]?> _sounds = new();
     private readonly object _cacheLock = new();
     private readonly BlockingCollection<Action> _work = new();
     private readonly Thread _worker;
@@ -31,11 +30,11 @@ public sealed class SoundService : IDisposable
     private IAudioOutput? _output;
     private ITimer? _idleTimer;
 
-    public SoundService(TimeProvider? time = null, IAudioOutputFactory? outputFactory = null, string? overrideFolder = null)
+    public SoundService(TimeProvider? time = null, IAudioOutputFactory? outputFactory = null, string? soundFolder = null)
     {
         _time = time ?? TimeProvider.System;
         _factory = outputFactory ?? new DefaultAudioOutputFactory();
-        _overrideFolder = overrideFolder;
+        _soundFolder = soundFolder;
         _lastActive = _time.GetTimestamp();
         _root = new RootProvider(this);
         _worker = new Thread(WorkLoop) { IsBackground = true, Name = "Aisa.Audio" };
@@ -61,7 +60,8 @@ public sealed class SoundService : IDisposable
     public void Play(SoundCue cue)
     {
         if (_disposed || _muted) return;
-        var data = Load(cue.ToString(), () => SoundSynth.Render(cue), fallbackOnFailure: true)!;
+        var data = Load(cue.ToString());
+        if (data == null) return;
         _ui.Add(new Voice(data, loop: false));
         Wake();
     }
@@ -69,8 +69,9 @@ public sealed class SoundService : IDisposable
     public void StartAlert(AlertTone tone)
     {
         if (_disposed) return;
-        var data = Load(tone.ToString(), () => SoundSynth.Render(tone), fallbackOnFailure: true)!;
         _alert.StopAll();
+        var data = Load(tone.ToString());
+        if (data == null) return;
         _alert.Add(new Voice(data, loop: tone == AlertTone.AlarmLoop));
         Wake();
     }
@@ -142,22 +143,16 @@ public sealed class SoundService : IDisposable
         try { o.Dispose(); } catch { }
     }
 
-    private float[]? Load(string name, Func<float[]> synth, bool fallbackOnFailure)
+    private float[]? Load(string name)
     {
         lock (_cacheLock)
         {
-            if (_overrideFolder != null)
-            {
-                if (!_overrides.TryGetValue(name, out var o))
-                {
-                    o = TryLoadWav(Path.Combine(_overrideFolder, name + ".wav"));
-                    _overrides[name] = o;
-                }
-                if (o != null) return o;
-            }
-            if (!_synthCache.TryGetValue(name, out var s))
-                _synthCache[name] = s = synth();
-            return s;
+            if (_sounds.TryGetValue(name, out var sound)) return sound;
+            sound = _soundFolder == null
+                ? null
+                : TryLoadWav(Path.Combine(_soundFolder, name + ".wav"));
+            _sounds[name] = sound;
+            return sound;
         }
     }
 
@@ -168,8 +163,8 @@ public sealed class SoundService : IDisposable
             if (!File.Exists(path)) return null;
             using var reader = new WaveFileReader(path);
             ISampleProvider src = reader.ToSampleProvider();
-            if (src.WaveFormat.SampleRate != SoundSynth.SampleRate)
-                src = new WdlResamplingSampleProvider(src, SoundSynth.SampleRate);
+            if (src.WaveFormat.SampleRate != AudioSampleRate)
+                src = new WdlResamplingSampleProvider(src, AudioSampleRate);
             var ch = src.WaveFormat.Channels;
             var samples = new List<float>();
             var buf = new float[4800 * ch];
@@ -182,7 +177,7 @@ public sealed class SoundService : IDisposable
                     for (var c = 0; c < ch; c++) sum += buf[i + c];
                     samples.Add(sum / ch);
                 }
-                if (samples.Count > SoundSynth.SampleRate * 60) break;
+                if (samples.Count > AudioSampleRate * 60) break;
             }
             return samples.Count > 0 ? samples.ToArray() : null;
         }
@@ -191,6 +186,8 @@ public sealed class SoundService : IDisposable
             return null;
         }
     }
+
+    private const int AudioSampleRate = 48000;
 
     private sealed class Voice(float[] data, bool loop)
     {
@@ -263,13 +260,18 @@ public sealed class SoundService : IDisposable
         private float[] _mono = new float[4096];
         private float _uiGain, _alertGain;
 
-        public WaveFormat WaveFormat { get; } = global::NAudio.Wave.WaveFormat.CreateIeeeFloatWaveFormat(SoundSynth.SampleRate, 2);
+        public WaveFormat WaveFormat { get; } = global::NAudio.Wave.WaveFormat.CreateIeeeFloatWaveFormat(AudioSampleRate, 2);
 
         public int Read(float[] buffer, int offset, int count)
         {
+            // Zero via typed indexing instead of Array.Clear: NAudio's SampleToWaveProvider uses
+            // WaveBuffer to alias byte[] as float[], so Array.Clear sees byte[] at runtime and
+            // clears only 1/4 of the float buffer (at a byte offset), leaving stale audio looping.
+            for (var i = 0; i < count; i++) buffer[offset + i] = 0f;
+
             var frames = count / 2;
+            if (frames <= 0) return count;
             if (_mono.Length < frames) _mono = new float[frames];
-            Array.Clear(buffer, offset, count);
 
             var uiTarget = svc._muted ? 0f : svc.UiVolume;
             var active = MixBank(svc._ui, buffer, offset, frames, ref _uiGain, uiTarget);
